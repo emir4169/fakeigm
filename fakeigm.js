@@ -387,6 +387,7 @@ G.init = () => {
 	        return total;
 	    }, 0);
 	}
+    G.startDate=parseInt(Date.now());
     G.getCostsStr=function(costs,neutral,specialOutput)
     {
         var str='';
@@ -648,7 +649,7 @@ G.init = () => {
 		me.t=0;
 		if (text) me.lt.innerHTML=text;
 		me.baseCSS='display:block;'+G.resolveIcon(icon,true);
-		if (true)
+		if (G.getSetting('particles')<3 && (G.currentFps<20 || G.getSetting('particles')==1))
 		{
 			//if low fps, trigger simple CSS animation instead
 			me.low=true;
@@ -659,6 +660,7 @@ G.init = () => {
 		G.particlesI++;
 		if (G.particlesI>=G.particlesN) G.particlesI=0;
 	}
+    l = function(id) { return document.getElementById(id); };
 	G.particlesLogic=function()
 	{
 		for (var i=0;i<G.particlesN;i++)
@@ -1864,7 +1866,8 @@ G.init = () => {
                 key: u.key, 
                 owned: u.owned 
             })),
-            settings: JSON.stringify(G.settings)
+            settings: JSON.stringify(G.settings),
+            startDate: G.startDate
         };
         window.localStorage.setItem('bunnyGameSave', btoa(JSON.stringify(saveData)));
         return btoa(JSON.stringify(saveData));
@@ -1904,6 +1907,7 @@ G.init = () => {
                     }
                 });
                 G.settings = JSON.parse(saveData.settings);
+                G.startDate = saveData.startDate;
                 // Update all displays
                 G.resources.forEach(updateResourceDisplay);
                 G.buildings.forEach(updateBuildingDisplay);
@@ -2196,6 +2200,7 @@ G.init = () => {
 					</div>
 					`+(G.desc?'<div class="listing desc"><div>'+`<div>`+G.desc+'</div>'+'</div></div>':'')+`
 					</div>
+                    <div class="listing">Game started <b>`+G.selfUpdatingText(function(){return sayTime(parseInt(Date.now())-G.startDate);})+` ago</b>.</div>
 					<div class="sectionTitle">Achievements</div>
 					<div class="listing b" style="max-width:640px;margin:auto;">
 						`+G.selfUpdatingText(function(){
@@ -2262,6 +2267,7 @@ G.init = () => {
         G.toastLogic();
         G.previousFps=G.currentFps;
 		G.currentFps=G.getFps();
+        G.time=new Date().getTime();
 		if (true)
 		{
 			document.getElementById('fpsCounter').innerHTML=G.currentFps+' fps';
