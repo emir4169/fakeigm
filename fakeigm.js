@@ -2215,7 +2215,7 @@ G.init = () => {
                                     str+=me.getQuickDom();
                                     owned++;
                                 } else {
-                                    str+=G.achievs[0].getQuickDom();
+                                    str+=G.achievs[0].getQuickDom(); // render the first achievement (the template) instead
                                 }
 								total++;
 							}
@@ -2251,6 +2251,7 @@ G.init = () => {
         G.bulkDisplay=G.bulkDisplay.getElementsByClassName('box-bit-content')[0];
     }
     // make a function that gets called every frame
+    G.T2 = 0;
     G.Logic=function(){
         if (G.keysD[27])//esc
 		{
@@ -2265,6 +2266,7 @@ G.init = () => {
         for (var i in G.shinies) G.shinies[i].logic();
         G.shiniesLogic();
         G.toastLogic();
+        G.T = G.T + 1 || 0;
         G.previousFps=G.currentFps;
 		G.currentFps=G.getFps();
         G.time=new Date().getTime();
@@ -2281,6 +2283,12 @@ G.init = () => {
 			ctx.lineTo(128,(1-G.currentFps/G.fps)*64);
 			ctx.stroke();
 		}
+        // if G.T%30==0, then increment another value
+        if (G.T%30==0) G.T2=G.T2+1;
+        // if G.T2%30==0, then save.
+        // is the autosave setting on
+        
+        if (G.T2%30==0 && G.getSetting('autosave') === 1) G.save();
         setTimeout(G.Logic,1000/G.fps);
     };
     G.Logic();
