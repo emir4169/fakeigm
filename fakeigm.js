@@ -177,7 +177,7 @@ G.init = () => {
             return G.Thing("button", key, text, 0, 0, effects, cssClasses, icon, () => true, 0,0, function(){G.hideTooltip();onclick()}, desc, true);
         }, //type, key, name, amount = 0, cost = 0, effects = [], cssClasses = [], icon = [], req, clickAmount = 0,totalAmount = 0, onclick,desc = "", showEarned = true
         shiny: function(key, name, moves, icon, effects, timeLeft) {
-            var shiny = G.Thing("shiny", key, name, 0, 0, effects, ["bigButton"], icon, () => true, 0,0,function(){shiny.clickAmount = shiny.clickAmount + 1;applyEffects(effects)}, "", true);
+            var shiny = G.Thing("shiny", key, name, 0, 0, effects, ["bigButton"], icon, () => true, 0,0,function(){shiny.clickAmount = shiny.clickAmount + 1;applyEffects(effects, 1)}, "", true);
             shiny.moves = moves;
             shiny.timeLeft = timeLeft*30;
             shiny.dur = 10;
@@ -374,7 +374,7 @@ G.init = () => {
 	                    if (upgrade.amount > 0) {
 	                        upgrade.effects.forEach(upEffect => {
 	                            if (upEffect.type === 'gain' && 
-	                                upEffect.arg1 === building.key) {  // This is the crucial check
+	                                (upEffect.arg1 === "all"||upEffect.arg1 === resourceKey||upEffect.arg1 === building.key)) {  // This is the crucial check
 	                                multiplier *= upEffect.arg2;
 	                            }
 	                        });
@@ -1237,7 +1237,7 @@ G.init = () => {
     G.upgrades.push(
         G.Thing("upgrade", "u1", "Machine", 0,    
             [G.idlessThing("resource", "cookie", "Cookies", 100, 0)],
-            [{ type: "gain", effect: "multiply", arg1: "cursor", arg2: 2 }], ["noText"],
+            [{ type: "gain", effect: "multiply", arg1: "cookie", arg2: 2 }], ["noText"],
             [{tile: true, url: 'https://orteil.dashnet.org/cookieclicker/img/icons.png', x: -0, y: -0}],
             () => (G.resources[0].totalAmount >= 10), 0,0,function(){},"A nice little supplement to your cookie production&apos; diet.</div><div><b>Effect:</b></div><div>&bull; 2x cookies"
         )
@@ -1247,7 +1247,7 @@ G.init = () => {
         G.button("bu1", "Make cookies", () => {     
             // add bunnies
             G.resources[0].clickAmount += 1;
-            applyEffects(G.buttons[0].effects);
+            applyEffects(G.buttons[0].effects, 1);
         }, [{ type: "instant", effect: "add", arg1: "cookie", arg2: 1 }],["bigButton","hasFlares","noText"], [{url: "https://orteil.dashnet.org/cookieclicker/img/icon.png"}]
         ,  "Click this cookie to get more cookies!"
         ),
@@ -1759,19 +1759,32 @@ G.init = () => {
     });
 
     // Game logic
-    function applyEffects(effects) {
+    function applyEffects(effects, amount = 1) {
         effects.forEach(effect => {
             const target = G.Things.find(r => r.key === effect.arg1);
+            let multiplier = amount;
+				
+            // Only apply upgrades that specifically target this building
+            G.upgrades.forEach(upgrade => {
+                if (upgrade.amount > 0) {
+                    upgrade.effects.forEach(upEffect => {
+                        if (upEffect.type === 'gain' && 
+                            upEffect.arg1 === target.key) {  // This is the crucial check
+                            multiplier *= upEffect.arg2;
+                        }
+                    });
+                }
+            });
             if (target) {
-                if (effect.effect === "add") {target.amount += effect.arg2;target.totalAmount += effect.arg2}
-                if (effect.effect === "multiply") {target.amount *= effect.arg2;target.totalAmount *= effect.arg2}
+                if (effect.effect === "add") {target.amount += effect.arg2*multiplier;target.totalAmount += effect.arg2*multiplier}
+                if (effect.effect === "multiply") {target.amount *= effect.arg2*multiplier;target.totalAmount *= effect.arg2*multiplier}
             }
         });
     }
 
     function gameTick() {
         G.buildings.forEach(building => {
-            if (building.amount > 0) applyEffects(building.effects);
+        if (building.amount > 0) applyEffects(building.effects, building.amount);
         });
         for (var i in G.achievs)
         {
