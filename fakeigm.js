@@ -179,14 +179,14 @@ G.init = () => {
         shiny: function(key, name, moves, icon, effects, timeLeft) {
             var shiny = G.Thing("shiny", key, name, 0, 0, effects, ["bigButton"], icon, () => true, 0,0,function(){shiny.clickAmount = shiny.clickAmount + 1;applyEffects(effects, 1)}, "", true);
             shiny.moves = moves;
-            shiny.timeLeft = timeLeft*30;
+            shiny.timeLeft = timeLeft*G.fps;
             shiny.dur = 10;
             shiny.durMult = 1;
             shiny.classes = shiny.cssClasses
             shiny.click = shiny.onclick
             shiny.logic = () => {
                 if (shiny.timeLeft <= 0) {
-                    shiny.timeLeft = timeLeft*30;
+                    shiny.timeLeft = timeLeft*G.fps;
                     G.spawnShiny(shiny);
                 } else {
                     shiny.timeLeft -= 1;
@@ -551,6 +551,44 @@ G.init = () => {
 			G.keysD={};
 			G.keysU={};
 		});
+    
+		//latency compensator stuff
+		G.time=new Date().getTime();
+		G.fpsMeasure=new Date().getTime();
+		G.accumulatedDelay=0;
+		G.catchupLogic=0;
+		G.fpsStartTime=0;
+		G.frameNumber=0;
+		G.getFps=function()
+		{
+			G.frameNumber++;
+			var currentTime=(Date.now()-G.fpsStartTime )/1000;
+			var result=Math.ceil((G.frameNumber/currentTime));
+			if (currentTime>1)
+			{
+				G.fpsStartTime=Date.now();
+				G.frameNumber=0;
+			}
+			return result;
+		}
+		
+		var div=document.createElement('div');
+		div.id='fpsCounter';
+		document.body.querySelector("#wrap").appendChild(div);
+		G.fpsCounter=div;
+		var div=document.createElement('canvas');
+		div.id='fpsGraph';
+		div.width=128;
+		div.height=64;
+		document.body.querySelector("#wrap").appendChild(div);
+		G.fpsGraph=div;
+		G.fpsGraphCtx=G.fpsGraph.getContext('2d');
+		var ctx=G.fpsGraphCtx;
+		ctx.fillStyle='#000';
+		ctx.fillRect(0,0,128,64);
+		G.currentFps=0;
+		G.previousFps=0;
+        
     G.Callbacks=[];
     G.callbackDepth=0;
     G.addCallbacks=function()
@@ -750,12 +788,12 @@ G.init = () => {
 			if (me.toDie)
 			{
 				me.toDie++;
-				if (me.toDie>=30*0.3) G.killToast(me);
+				if (me.toDie>=G.fps*0.3) G.killToast(me);
 			}
 			else
 			{
 				me.t++;
-				if (me.dur>0 && me.t>=me.dur*30) G.closeToast(me);
+				if (me.dur>0 && me.t>=me.dur*G.fps) G.closeToast(me);
 			}
 		}
 	}
@@ -1048,7 +1086,7 @@ G.init = () => {
 			x:0,
 			y:0,
 			t:0,
-			tm:Math.max(0,30*type.dur*type.durMult),
+			tm:Math.max(0,G.fps*type.dur*type.durMult),
 		};
 		me.l=document.createElement('div');
 		var moves=me.type.moves;
@@ -1507,7 +1545,9 @@ G.init = () => {
 	    }
 	    return container;
 	}
-    G.l = document.body
+    G.fps=30;
+    G.l = document.body.querySelector("#game")
+	G.wrapl=document.body.querySelector("#wrap")
 	function populateContainers() {
 	    const containers = {
 	        resource: document.getElementById('box-things-Resources'),
@@ -1917,8 +1957,8 @@ G.init = () => {
 			}
 		}},
 		'particles':{val:2},
-		'showFPS':{val:0,onchange:function(val){
-			/*if (val)
+		'showFPS':{val:1,onchange:function(val){
+			if (val)
 			{
 				G.fpsGraph.style.display='block';
 				G.fpsCounter.style.display='block';
@@ -1927,7 +1967,7 @@ G.init = () => {
 			{
 				G.fpsGraph.style.display='none';
 				G.fpsCounter.style.display='none';
-			}*/console.log("this setting doesnt work!")
+			}//console.log("this setting doesnt work!")
 		}},
 	};
 	for (var i in G.settings){G.settings[i].key=i;}
@@ -2220,12 +2260,28 @@ G.init = () => {
         for (var i in G.shinies) G.shinies[i].logic();
         G.shiniesLogic();
         G.toastLogic();
+        G.previousFps=G.currentFps;
+		G.currentFps=G.getFps();
+		if (true)
+		{
+			document.getElementById('fpsCounter').innerHTML=G.currentFps+' fps';
+			var ctx=G.fpsGraphCtx;
+			ctx.drawImage(G.fpsGraph,-1,0);
+			ctx.fillStyle='rgb('+Math.round((1-G.currentFps/G.fps)*128)+',0,0)';
+			ctx.fillRect(128-1,0,1,64);
+			ctx.strokeStyle='#fff';
+			ctx.beginPath();
+			ctx.moveTo(128-1,(1-G.previousFps/G.fps)*64);
+			ctx.lineTo(128,(1-G.currentFps/G.fps)*64);
+			ctx.stroke();
+		}
+        setTimeout(G.Logic,1000/G.fps);
     };
     G.Logic();
     // make the G.Logic() function be called every frame
-    AddEvent(window,'load',function(){
+    /*AddEvent(window,'load',function(){
         G.Logic();
         setInterval(G.Logic,1000/30);
-    });
+    });*/
 };
 document.addEventListener("DOMContentLoaded",G.init)
