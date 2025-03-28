@@ -1542,7 +1542,7 @@ G.init = () => {
 	}
 	populateContainers();
 	// In the getProductionRate function, modify the upgrade effect check:
-	function getProductionRate(resourceKey) {
+	getProductionRate= G.getProductionRate/*function(resourceKey) {
 	    return G.buildings.reduce((total, building) => {
 	        building.effects.forEach(effect => {
 	            if (effect.type === 'tick' && effect.arg1 === resourceKey) {
@@ -1553,7 +1553,7 @@ G.init = () => {
 	                    if (upgrade.amount > 0) {
 	                        upgrade.effects.forEach(upEffect => {
 	                            if (upEffect.type === 'gain' && 
-	                                upEffect.arg1 === building.key) {  // This is the crucial check
+	                                (upEffect.arg1 === "all"||upEffect.arg1 === resourceKey||upEffect.arg1 === building.key)) {  // This is the crucial check
 	                                multiplier *= upEffect.arg2;
 	                            }
 	                        });
@@ -1565,7 +1565,7 @@ G.init = () => {
 	        });
 	        return total;
 	    }, 0);
-	}
+    }*/
 
 	// Update resource display to show proper names
 	function updateResourceDisplay(resource) {
