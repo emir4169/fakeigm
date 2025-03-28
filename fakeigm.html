@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<head>
+	<html>
+
+	<head>
+		<title>Fake IGM</title>
+		<link href="https://orteil.dashnet.org/igm/lib/style.css?v=1" rel="stylesheet" type="text/css">
+		<link href="https://orteil.dashnet.org/igm/style.css?v=1" rel="stylesheet" type="text/css">
+		<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="https://orteil.dashnet.org/igm/stuff/basic.css">
+        <style>
+            body
+                {
+                    background-image: url("https://orteil.dashnet.org/igm/stuff/meadow.jpg"); /* in my defense i couldnt figure out how to make a solid color background with the workarounds*/
+                    background-size: cover;
+                    background-position: center;
+                }
+            #game
+            {
+                color: #ffff; /* hack */
+            }
+            .popup
+            {
+                opacity:1;/*
+                margin-top:400px;
+                margin-left:50%;*/ /* leftovers from before i implemented G.w and G.h so that the popups can center themselves*/
+            }
+            #bulkDisplay
+            {
+                opacity: initial;
+                background: initial;
+                /*background: #39f;*/
+            }
+        </style>
+    <!--    <link type="text/css" rel="stylesheet" href="https://orteil.dashnet.org/igm/stuff/bigBlue.css"> -->
+		<script src="fakeigm.js"></script>
+	</head>
+
+	<body>
+		<div id="game" class="filtersOn on">
+       <div id="content">
+            <div class="box" id="box-main">
+                <div class="box fullWidth" id="box-res">
+                    <div class="box-things" id="box-things-Resources"></div>
+                </div>
+                <div class="box" id="box-buttons">
+                    <div class="box-things" id="box-things-Buttons"></div>
+                </div>
+            </div>
+            <div class="box" id="box-store">
+                <div class="box" id="box-buildings">
+                    <div class="box-header">
+                        <div><div class="title">Buildings</div></div>
+                    </div>
+                    <div id="bulkDisplay" class="box-bit">
+                        <div class="box-bit-content">Buying <b>1</b></div>
+                    </div>
+                    <div class="box-things" id="box-things-Buildings"></div>
+                </div>
+                <div class="box" id="box-upgrades">
+                    <div class="box-header">
+                        <div><div class="title">Upgrades</div></div>
+                    </div>
+                    <div class="box-things" id="box-things-Upgrades"></div>
+                </div>
+            </div>
+        </div>
+		<div id="meta-buttons">
+			<div class="meta-button" id="meta-button-settings"></div>
+			<div class="meta-button" id="meta-button-info"></div>
+		</div>
+        <div id="shinies" class="shadowed">
+
+        </div>
+        <div id="particles" class="shadowed">
+
+        </div>
+        <div id="toasts" class="shadowed">
+            
+        </div>
+		<div id="popups">
+			<div id="darken" class="off"></div>
+		</div>
+		<div id="tooltip" style="opacity: 0; display: relative; left: 432px; top: 554px;" class="fadeOutQuick">
+			<div id="tooltipPU" class="tooltipPoint" style="display: none; left: 154px; top: -6px;"></div>
+			<div id="tooltipPD" class="tooltipPoint" style="display: none;"></div>
+			<div id="tooltipPL" class="tooltipPoint" style="display: none;"></div>
+			<div id="tooltipPR" class="tooltipPoint" style="display: block; right: -6px; top: 27px;"></div>
+			<div id="tooltipContent">
+				
+			</div>
+		</div>
+	</html>
