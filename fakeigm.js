@@ -397,6 +397,7 @@ G.init = () => {
         {
             var w=G.Things[i];
             var v=costs[i];
+            if (v == 0) continue;
             //if (v>w.amount) t=-1;
             if (G.getProductionRate(w.key) == 0) t=-1;
             // veryCOolStRingThatWillNeverBeAnywhereElse1
@@ -1272,14 +1273,26 @@ G.init = () => {
             [{tile: true, url: 'https://orteil.dashnet.org/cookieclicker/img/icons.png', x: -0, y: -29}],
             () => (true), 0,0,function(){},"A tiny little cursor clicking your cookie.</div><div><b>Effect:</b></div><div>&bull; Produces 1 cookie every 10 seconds.",true
         ),
+        G.Thing("building", "grandma", "Grandma", 0,    
+            [G.idlessThing("resource", "cookie", "Cookies", 100, 0)],
+            [{ type: "tick", effect: "add", arg1: "cookie", arg2: 4 }], [],
+            [{tile: true, url: 'https://orteil.dashnet.org/cookieclicker/img/icons.png', x: -1, y: -29}],
+            () => (G.resources[0].totalAmount >= 50), 0,0,function(){},"A nice grandma to bake more cookies.</div><div><b>Effect:</b></div><div>&bull; Produces 4 cookies every second.",true
+        ),
     );
 
     G.upgrades.push(
-        G.Thing("upgrade", "u1", "Machine", 0,    
+        G.Thing("upgrade", "u1", "Reinforced Index Finger", 0,    
             [G.idlessThing("resource", "cookie", "Cookies", 100, 0)],
             [{ type: "gain", effect: "multiply", arg1: "cookie", arg2: 2 }], ["noText"],
             [{tile: true, url: 'https://orteil.dashnet.org/cookieclicker/img/icons.png', x: -0, y: -0}],
-            () => (G.resources[0].totalAmount >= 10), 0,0,function(){},"A nice little supplement to your cookie production&apos; diet.</div><div><b>Effect:</b></div><div>&bull; 2x cookies"
+            () => (G.resources[0].totalAmount >= 10), 0,0,function(){},"prod prod</div><div><b>Effect:</b></div><div>&bull; 2x cookie production"
+        ),
+        G.Thing("upgrade", "u2", "Carpal tunnel prevention cream", 0,    
+            [G.idlessThing("resource", "cookie", "Cookies", 500, 0)],
+            [{ type: "gain", effect: "multiply", arg1: "cookie", arg2: 2 }], ["noText"],
+            [{tile: true, url: 'https://orteil.dashnet.org/cookieclicker/img/icons.png', x: -0, y: -1}],
+            () => (G.resources[0].totalAmount >= 100), 0,0,function(){},"it.... it hurts to click....</div><div><b>Effect:</b></div><div>&bull; 2x cookie production"
         )
     );
 
